@@ -329,3 +329,6 @@ Exit code: 0.
 
 Exit code: 0.
 
+## Final evidence whitespace correction
+
+After appending the pre-commit snapshot, the staged check reported `docs/evidence/WU-01-schema-fixture-evidence.md:331: new blank line at EOF.` The shell sequence still created the main commit. Removed the excess final blank line and preserved the main commit rather than rewriting history. This follow-up documentation correction is checked across the complete WU-01 diff against the baseline before committing.
