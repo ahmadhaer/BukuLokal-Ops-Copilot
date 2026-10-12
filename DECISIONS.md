@@ -73,3 +73,9 @@ Google Sheets integration is P1 and must not block submission.
 Status: approved.
 
 Work Units are independently gated before progression.
+
+## ADR-013 — Order-scoped inventory correlation for hackathon evidence
+
+Status: approved by WU-01.
+
+`InventoryItem.relatedOrderId` is optional and may be null. When present, it enables deterministic correlation between a material requirement and an order for future evidence. This is a prototype simplification, not a universal manufacturing/ERP inventory architecture. It introduces no shortage calculation or issue engine.
