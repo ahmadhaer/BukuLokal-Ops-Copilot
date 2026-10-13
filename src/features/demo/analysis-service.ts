@@ -6,7 +6,7 @@ import type { IssueAnalysisProvider } from "../../ai/analysis/provider";
 import { createVertexProvider, readVertexConfig } from "../../ai/client/google-genai";
 import { buildDemoWorkspace } from "./workspace";
 
-export type DemoAnalysisResponse = { status: "success"; result: Extract<AnalysisResult, { ok: true }>; input: IssueAnalysisInput }
+export type DemoAnalysisResponse = { status: "success"; result: Omit<Extract<AnalysisResult, { ok: true }>, "attempts"> & { attempts?: number }; input: IssueAnalysisInput }
   | { status: "unconfigured" | "unavailable" | "invalid"; message: string };
 export function isAiConfigured(): boolean {
   try { readVertexConfig(); return true; } catch { return false; }

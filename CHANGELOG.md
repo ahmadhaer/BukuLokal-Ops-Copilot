@@ -54,3 +54,10 @@
 - Added server-only Gemini/import Server Actions with honest unavailable states and authoritative server reconstruction; no runtime fake AI.
 - Added pure canonical suggested/edit/approve/reject actions, AI provenance, and audit events in a refresh-resetting demo session; no external execution.
 - Added responsive, labeled controls, route decoding regression coverage, fake-provider golden-flow/import/UI tests, and production/browser/secret-scan evidence.
+
+## WU-07 — Trusted server Firestore persistence
+
+- Added official Firestore server SDK 9.3.1, lazy ADC client, organization-scoped validated repositories, canonical JSON serialization, and stable persistence errors.
+- Added atomic deterministic demo seeding, consistent workspace reload, validated AI/suggestion batches, transactional Human Gate/audits, and create-only normalized import persistence with explicit batch limits.
+- Connected the demo UI to server persistence and reload; unavailable storage reports a truthful read-only state. No browser Firebase SDK or memory fallback was introduced in production.
+- Added repository/atomicity/concurrency/isolation/import/AI/UI reconstruction/SDK-boundary tests and persistence/security evidence. No cloud provisioning or live database/inference was performed.

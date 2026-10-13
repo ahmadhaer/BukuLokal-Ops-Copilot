@@ -1,0 +1,26 @@
+[
+  {
+    "command": "pwd",
+    "output": "/workspace/BukuLokal-Ops-Copilot\n"
+  },
+  {
+    "command": "git rev-parse --show-toplevel",
+    "output": "/workspace/BukuLokal-Ops-Copilot\n"
+  },
+  {
+    "command": "git remote -v",
+    "output": "origin\thttps://github.com/ahmadhaer/BukuLokal-Ops-Copilot.git (fetch)\norigin\thttps://github.com/ahmadhaer/BukuLokal-Ops-Copilot.git (push)\n"
+  },
+  {
+    "command": "git branch --show-current",
+    "output": "wu/06-product-ui-human-gate\n"
+  },
+  {
+    "command": "git status --short",
+    "output": ""
+  },
+  {
+    "command": "git log --oneline --decorate --all -30",
+    "output": "9258640 (HEAD -> wu/06-product-ui-human-gate) feat: add product UI and human approval gate\nc3e8887 (wu/05-gemini-intelligence-layer) feat: add evidence-grounded Gemini intelligence layer\n53bc8f0 (wu/04-issue-detection-evidence-engine) feat: add deterministic issue detection and evidence engine\nf1ca162 (wu/03-deterministic-operations-engine) feat: add deterministic operations facts engine\n69e3a01 (wu/02-import-normalize-validate) feat: add deterministic CSV and XLSX import pipeline\n8b4bfe2 (wu/01-synthetic-data-canonical-schema) docs: correct WU-01 evidence trailing whitespace\na480697 feat: establish canonical manufacturing schemas and demo fixture\n478466d (wu/00-repository-governance-bootstrap) chore: bootstrap AI Builder Cup foundation and canonical governance\n08cb126 (origin/main, work) Initial commit\n"
+  }
+]
