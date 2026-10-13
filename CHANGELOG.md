@@ -40,3 +40,10 @@
 - Added deterministic identifiers, explicit detectedAt context, canonical Issue/Evidence generation, rule-trace metadata, and bidirectional reference validation.
 - Added completed-status consistency errors, source/fact checks, rule/evidence/determinism tests, and full-fixture detection evidence.
 - Documented the policy boundaries; no AI, recommendations, actions, persistence, UI, or API was added, and existing schemas/facts remain unchanged.
+
+## WU-05 — Evidence-grounded Gemini advisory layer
+
+- Added the current Google Gen AI SDK and a server-side Vertex AI/ADC adapter with explicit environment configuration and structured JSON output.
+- Added bounded selected-issue input, strict advisory schema, versioned guardrails, evidence/action compatibility validation, and one validation retry with safe failures.
+- Added in-memory canonical AIAnalysis provenance using explicit createdAt, fake-provider/SDK contract tests, SO-001 advisory tests, and source immutability checks.
+- Added integration/evidence documentation and environment placeholders. No live inference, actions, persistence, UI, API, or cloud provisioning was performed.
