@@ -1,0 +1,8 @@
+id,customerName,productName,orderedQuantity,quantityUnit,dueDate,status
+,Synthetic Customer A,Classic T-Shirt,500,pcs,2026-10-14,planned
+SO-NEGATIVE,Synthetic Customer B,Synthetic Polo,-10,pcs,2026-10-14,planned
+SO-ZERO,Synthetic Customer C,Synthetic Apron,0,pcs,2026-10-14,planned
+SO-DATE,Synthetic Customer D,Synthetic Tote,10,pcs,12/10/26,planned
+SO-STATUS,Synthetic Customer E,Synthetic Cap,10,pcs,2026-10-14,unknown
+SO-NUMBER,Synthetic Customer F,Synthetic Vest,five hundred,pcs,2026-10-14,planned
+SO-VALID,Synthetic Customer G,Synthetic Shirt,10,pcs,2026-10-14,planned

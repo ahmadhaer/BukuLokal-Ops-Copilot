@@ -19,3 +19,10 @@
 - Added a fixed-date, fictional ABC Apparel fixture with 12 orders, 12 production jobs, and 12 inventory records; future issues, evidence, AI analyses, actions, and audit events remain empty.
 - Added schema validation, fixture integrity, and anti-leakage tests.
 - Recorded ADR-013 for optional order-scoped inventory correlation and captured WU-01 validation evidence.
+
+## WU-02 — Deterministic CSV/XLSX ingestion
+
+- Added Papa Parse, ExcelJS, and Papa Parse TypeScript declarations; existing dependency versions are unchanged.
+- Added file safety checks, raw table parsers preserving source rows/headers, deterministic mapping suggestions, explicit confirmed mapping contracts, and pure import preview.
+- Added order/production/inventory normalization ending in the existing canonical Zod schemas, with explicit defaults and structured row errors.
+- Added fresh synthetic CSV/XLSX fixtures, import tests, and import-contract/evidence documentation. No business calculations, AI, database, API, or UI behavior was added.
