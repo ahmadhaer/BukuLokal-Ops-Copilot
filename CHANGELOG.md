@@ -47,3 +47,10 @@
 - Added bounded selected-issue input, strict advisory schema, versioned guardrails, evidence/action compatibility validation, and one validation retry with safe failures.
 - Added in-memory canonical AIAnalysis provenance using explicit createdAt, fake-provider/SDK contract tests, SO-001 advisory tests, and source immutability checks.
 - Added integration/evidence documentation and environment placeholders. No live inference, actions, persistence, UI, API, or cloud provisioning was performed.
+
+## WU-06 — Product UI and Human Gate
+
+- Added landing, data-source, derived dashboard, filtered issues, evidence detail, actions, activity, and CSV/XLSX preview/mapping/data-health screens.
+- Added server-only Gemini/import Server Actions with honest unavailable states and authoritative server reconstruction; no runtime fake AI.
+- Added pure canonical suggested/edit/approve/reject actions, AI provenance, and audit events in a refresh-resetting demo session; no external execution.
+- Added responsive, labeled controls, route decoding regression coverage, fake-provider golden-flow/import/UI tests, and production/browser/secret-scan evidence.
