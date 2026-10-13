@@ -26,3 +26,10 @@
 - Added file safety checks, raw table parsers preserving source rows/headers, deterministic mapping suggestions, explicit confirmed mapping contracts, and pure import preview.
 - Added order/production/inventory normalization ending in the existing canonical Zod schemas, with explicit defaults and structured row errors.
 - Added fresh synthetic CSV/XLSX fixtures, import tests, and import-contract/evidence documentation. No business calculations, AI, database, API, or UI behavior was added.
+
+## WU-03 — Deterministic operational facts
+
+- Added pure production aggregation, individual material shortage, calendar deadline, order-view, and full-dataset derivation functions.
+- Added derived Zod contracts, typed integrity errors, explicit as-of dates, and two-decimal percentage rounding with ordered quantity as denominator.
+- Added computation, integrity, timezone-safety, full-fixture, and regression validation evidence/tests; canonical source schemas and import contracts remain unchanged.
+- Documented formulas and boundaries. No severity, issue/evidence generation, recommendations, AI, persistence, API, or UI was added.
