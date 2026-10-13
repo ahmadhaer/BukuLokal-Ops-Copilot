@@ -15,11 +15,11 @@ export const GeminiIssueAnalysisSchema = z.strictObject({
   cannotDetermine: z.array(text).max(16),
 });
 export type GeminiIssueAnalysis = z.infer<typeof GeminiIssueAnalysisSchema>;
-// Current Vertex JSON-schema subset excludes string-length keywords; Zod enforces them locally.
+// Vertex responseJsonSchema excludes string-length and pattern keywords; Zod enforces them locally.
 function supportedJsonSchema(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(supportedJsonSchema);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value)
-    .filter(([key]) => !["$schema", "minLength", "maxLength"].includes(key))
+    .filter(([key]) => !["$schema", "minLength", "maxLength", "pattern"].includes(key))
     .map(([key, child]) => [key, supportedJsonSchema(child)]));
   return value;
 }
