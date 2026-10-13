@@ -61,3 +61,11 @@
 - Added atomic deterministic demo seeding, consistent workspace reload, validated AI/suggestion batches, transactional Human Gate/audits, and create-only normalized import persistence with explicit batch limits.
 - Connected the demo UI to server persistence and reload; unavailable storage reports a truthful read-only state. No browser Firebase SDK or memory fallback was introduced in production.
 - Added repository/atomicity/concurrency/isolation/import/AI/UI reconstruction/SDK-boundary tests and persistence/security evidence. No cloud provisioning or live database/inference was performed.
+
+## WU-08 — Persistent end-to-end application integration
+
+- Added a single trusted-server production composition root, safe capability assessment, and application use cases joining the approved domain/AI/persistence layers.
+- Integrated persisted demo/detail facts, explicit grounded AI with atomic suggested actions/audits, deterministic operation replay, persistent review/Activity, and refresh reconstruction.
+- Added explicit reviewed Save Valid Data with server revalidation and factual counts; no imported issue reconciliation or history deletion was introduced.
+- Added broad UI/application integration, fault/security/replay tests, isolated full-browser test composition, production configuration/import checks, measured demo timing, and demo runbook/evidence.
+- Milestone: HACKATHON_MVP_APPLICATION_INTEGRATED. No live cloud verification, deployment, authentication, Sheets connector, or external execution.

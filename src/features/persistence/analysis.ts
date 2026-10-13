@@ -30,10 +30,14 @@ export function validateStoredAnalysis(record: AIAnalysis, data: DemoDataset) {
     return { record: parsed.data, analysis, input };
   } catch { throw new PersistenceError("PERSISTENCE_INVALID_DOCUMENT", "Only evidence-grounded validated analysis may be stored."); }
 }
-export async function persistValidatedAnalysis(repository: WorkspaceRepository, organizationId: string, record: AIAnalysis, context: GateContext, suggestionIndexes: number[] = []) {
+export function analysisOperationAuditId(organizationId: string, record: Pick<AIAnalysis, "issueId" | "model" | "promptVersion">, operationId: string) {
+  const part = (value: string) => `${value.length}:${value}`;
+  return safeId(`AUD-AI-OP:${[organizationId, record.issueId, record.model, record.promptVersion, operationId].map(part).join(":")}`);
+}
+export async function persistValidatedAnalysis(repository: WorkspaceRepository, organizationId: string, record: AIAnalysis, context: GateContext, suggestionIndexes: number[] = [], operationId?: string) {
   if (context.organizationId !== organizationId) throw new PersistenceError("PERSISTENCE_INVALID_DOCUMENT", "Analysis context does not match its organization.");
   const data = await loadWorkspace(repository, organizationId); const valid = validateStoredAnalysis(record, data);
-  const event = AuditEventSchema.parse({ id: `AUD-AI:${valid.record.id}:${context.sequence}`, organizationId, actor: context.actor, event: "ai_analysis_completed", entityType: "ai_analysis", entityId: valid.record.id, timestamp: context.occurredAt });
+  const event = AuditEventSchema.parse({ id: operationId ? analysisOperationAuditId(organizationId, valid.record, operationId) : `AUD-AI:${valid.record.id}:${context.sequence}`, organizationId, actor: context.actor, event: "ai_analysis_completed", entityType: "ai_analysis", entityId: valid.record.id, timestamp: context.occurredAt });
   const writes: Write[] = [{ collection: "ai_analyses", value: valid.record, mode: "create" }, { collection: "audit_events", value: event, mode: "create" }];
   for (const [offset, index] of suggestionIndexes.entries()) { const created = createSuggestedAction(valid.record, valid.input, index, { ...context, sequence: context.sequence + offset + 1 }); writes.push({ collection: "actions", value: created.entry.action, mode: "create" }, { collection: "audit_events", value: created.event, mode: "create" }); }
   await repository.batch(organizationId, writes);

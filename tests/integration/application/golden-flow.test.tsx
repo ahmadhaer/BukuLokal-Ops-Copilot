@@ -1,0 +1,30 @@
+// @vitest-environment jsdom
+import { writeFileSync,readFileSync } from "node:fs";
+import { afterEach,describe,expect,it } from "vitest";
+import { cleanup,render,screen,within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ApplicationHarness } from "./ui-harness";
+import { buildTestApplication } from "./helpers";
+import { ActionSchema,AuditEventSchema } from "../../../src/domain";
+afterEach(cleanup);
+describe("complete application golden path",()=>{
+  it("Landing → persistent Demo → SO-001 → grounded AI → suggested → Approve → Activity → reload",async()=>{
+    const started=performance.now();const built=buildTestApplication();const user=userEvent.setup();render(<ApplicationHarness application={built.application}/>);
+    expect(screen.getByRole("heading",{name:"BukuLokal Ops Copilot"})).toBeTruthy();await user.click(screen.getByRole("link",{name:"Try Demo"}));await screen.findByRole("heading",{name:"Operations overview"});
+    const article=screen.getByRole("heading",{name:"SO-001 may miss its deadline"}).closest("article")!;expect(within(article).getByText("Critical")).toBeTruthy();await user.click(within(article).getByRole("link",{name:"Review Issue"}));
+    await screen.findByRole("heading",{name:"SO-001 may miss its deadline"});expect(screen.getByText("30%")).toBeTruthy();expect(screen.getByText("200 pcs")).toBeTruthy();expect(screen.getByText("2 days")).toBeTruthy();expect(screen.getByText(/350 pcs/)).toBeTruthy();expect(built.provider.requests).toHaveLength(0);
+    await user.click(screen.getByRole("button",{name:"Analyze with AI"}));await screen.findByText("Synthetic order needs operational review.");const elapsed=performance.now()-started;expect(elapsed).toBeLessThan(120000);
+    writeFileSync("/tmp/wu08-test-timing.json",JSON.stringify({measurement:"Landing to first meaningful validated recommendation",elapsed_ms:elapsed,provider:"explicit test network double",live_network_latency_measured:false},null,2));
+    expect((screen.getByRole("button",{name:"Create Suggested Action"}) as HTMLButtonElement).disabled).toBe(true);expect(screen.getByText("suggested")).toBeTruthy();expect(screen.getAllByText("Nothing will be sent automatically.").length).toBeGreaterThan(0);
+    const before=await built.application.getSession();if(!before.ok)throw new Error("Expected session");expect(ActionSchema.safeParse(before.value.actions[0].action).success).toBe(true);expect(before.value.actions[0].action.status).toBe("suggested");
+    await user.click(screen.getByRole("button",{name:"Approve"}));await screen.findByText(/Approved by Demo owner/);await user.click(screen.getByRole("link",{name:"Activity"}));await screen.findByText("Action approved");expect(screen.getByText("AI analysis generated")).toBeTruthy();expect(screen.getByText("Action suggested")).toBeTruthy();cleanup();
+    const reconstructed=buildTestApplication({state:built.state});render(<ApplicationHarness application={reconstructed.application} initialPath="/actions"/>);await screen.findByText(/Approved by Demo owner/);expect(screen.queryByRole("button",{name:"Approve"})).toBeNull();const session=await reconstructed.application.getSession();if(!session.ok)throw new Error("Expected reload");expect(session.value.actions[0].action.approvedBy).toBe("demo-owner");expect(session.value.events.every(event=>AuditEventSchema.safeParse(event).success)).toBe(true);expect(session.value.events.some(event=>event.event==="action_approved")).toBe(true);expect(reconstructed.provider.requests).toHaveLength(0);
+  });
+  it("fast repeated Analyze clicks replay the same operation rather than creating new suggestions",async()=>{
+    const built=buildTestApplication();const user=userEvent.setup();render(<ApplicationHarness application={built.application}/>);await user.click(screen.getByRole("link",{name:"Try Demo"}));await screen.findByRole("heading",{name:"Operations overview"});const article=screen.getByRole("heading",{name:"SO-001 may miss its deadline"}).closest("article")!;await user.click(within(article).getByRole("link",{name:"Review Issue"}));await screen.findByRole("heading",{name:"SO-001 may miss its deadline"});await user.click(screen.getByRole("button",{name:"Analyze with AI"}));await screen.findByText("Synthetic order needs operational review.");await user.click(screen.getByRole("button",{name:"Analyze with AI"}));expect(built.provider.requests).toHaveLength(1);expect((await built.repository.read("ORG-001").list("ai_analyses"))).toHaveLength(1);expect((await built.repository.read("ORG-001").list("actions"))).toHaveLength(1);
+  });
+  it("Upload → Preview → Mapping → Data Health → explicit Save Valid Data",async()=>{
+    const built=buildTestApplication();await built.application.openDemoWorkspace();const user=userEvent.setup();render(<ApplicationHarness application={built.application} initialPath="/import"/>);const input=await screen.findByLabelText("CSV or Excel file");expect(screen.queryByRole("button",{name:"Save Valid Data"})).toBeNull();await user.upload(input,new File([readFileSync("tests/fixtures/imports/invalid-orders.csv")],"invalid-orders.csv"));await user.click(screen.getByRole("button",{name:"Import Preview"}));await screen.findByRole("heading",{name:"Review Mapping"});await user.click(screen.getByLabelText("I confirm these mappings and explicit defaults."));await user.click(screen.getByRole("button",{name:"Confirm Mapping and Check Data"}));await screen.findByRole("heading",{name:"Data Health"});
+    const before=await built.repository.read("ORG-001").list("orders");expect(before).toHaveLength(12);await user.click(screen.getByRole("button",{name:"Save Valid Data"}));await screen.findByText("1 valid records saved · 6 invalid rows were not saved");expect((await built.repository.read("ORG-001").list("orders"))).toHaveLength(13);expect(screen.getByText(/Operational issue refresh for imported data/)).toBeTruthy();expect((screen.getByRole("button",{name:"Save Valid Data"}) as HTMLButtonElement).disabled).toBe(true);
+  });
+});
