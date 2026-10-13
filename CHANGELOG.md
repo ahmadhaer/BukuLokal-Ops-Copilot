@@ -33,3 +33,10 @@
 - Added derived Zod contracts, typed integrity errors, explicit as-of dates, and two-decimal percentage rounding with ordered quantity as denominator.
 - Added computation, integrity, timezone-safety, full-fixture, and regression validation evidence/tests; canonical source schemas and import contracts remain unchanged.
 - Documented formulas and boundaries. No severity, issue/evidence generation, recommendations, AI, persistence, API, or UI was added.
+
+## WU-04 — Deterministic issues and evidence
+
+- Added centralized configurable hackathon issue policies with critical/high/medium delay precedence and per-inventory shortage severity.
+- Added deterministic identifiers, explicit detectedAt context, canonical Issue/Evidence generation, rule-trace metadata, and bidirectional reference validation.
+- Added completed-status consistency errors, source/fact checks, rule/evidence/determinism tests, and full-fixture detection evidence.
+- Documented the policy boundaries; no AI, recommendations, actions, persistence, UI, or API was added, and existing schemas/facts remain unchanged.
