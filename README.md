@@ -1,57 +1,317 @@
 # BukuLokal Ops Copilot
 
-AI Builder Cup 2026 — a fresh standalone prototype for operational decision support.
+**AI Builder Cup 2026 — Manufacturing / Intelligent Operations**
 
-## Problem and prototype objective
+BukuLokal Ops Copilot is a fresh standalone hackathon prototype for small-manufacturer operational decision support. It turns order, inventory, procurement, and production data into deterministic issue detection, evidence-grounded AI guidance, and human-approved internal actions.
 
-The approved target addresses operational evidence and decision support: imported operational data should support deterministic calculations, issue evidence, and advisory AI recommendations subject to human approval. The complete owner-approved BL-AIBC-PRD-001 v0.1 is stored in [PRD.md](PRD.md); this summary does not substitute for it.
+> Core operating model: **Data → Detect Problem → AI Explains → AI Recommends → Human Approves → Action**
 
-## Current implementation status
+This repository is intentionally scoped as an operations copilot rather than a full ERP or a generic chatbot.
 
-**Foundation / bootstrap only.**
-**Product functionality not yet implemented.**
+## Current MVP status
 
-The homepage identifies the project and states this scope. No dashboard, manufacturing data, business engine, AI, integration, authentication, persistence, or deployment exists.
+The application MVP is implemented and deployed to Google Cloud Run. The deterministic operational path, persistence, import workflow, Human Gate, and diagnostic instrumentation are working. The remaining active blocker is the live in-application Gemini request path: the application currently receives a Vertex AI `400 ApiError` at the provider-request stage. Direct Vertex Gemini smoke tests succeed, so the current investigation is focused on the exact production request payload rather than model availability, Firestore, networking, or IAM.
+
+| Capability | Status |
+| --- | --- |
+| Responsive Next.js application | ✅ Implemented |
+| CSV / XLSX import preview, mapping, validation, and reviewed save | ✅ Implemented |
+| Deterministic operational calculations | ✅ Implemented |
+| Issue detection and canonical evidence | ✅ Implemented |
+| SO-001 deterministic golden-path facts | ✅ Implemented |
+| Firestore persistence | ✅ Live verified |
+| Human approval / edit / reject gate | ✅ Implemented |
+| Activity / audit history and refresh durability | ✅ Implemented locally and persistence-backed |
+| Cloud Run deployment | ✅ Live |
+| Direct Vertex Gemini structured-output smoke test | ✅ Live verified |
+| Safe server-side AI diagnostics | ✅ Deployed |
+| In-application Gemini analysis | ⚠️ Active diagnosis — Vertex provider request returns HTTP 400 |
+| Google Sheets integration | ⏸ Deferred to P1 |
+| External autonomous execution | ❌ Intentionally not implemented |
+| Authentication | ❌ Not part of the current hackathon MVP |
+
+### Verification baseline
+
+Latest local verification on the active deployment branch:
+
+- **410 tests passed across 46 files**
+- `npm run lint` — PASS
+- `npm run typecheck` — PASS
+- `npm run build` — PASS
+- Cloud Run revision with AI diagnostics deployed
+- Firestore live create/read/delete smoke test — PASS
+- Direct Vertex Gemini `gemini-3.5-flash` smoke test — PASS
+
+The current working branch is:
+
+```text
+wu/10-google-cloud-live-deployment
+```
+
+## Live application
+
+Cloud Run service:
+
+```text
+https://bukulokal-ops-copilot-761334564667.asia-southeast2.run.app
+```
+
+The service is public for hackathon demonstration purposes. It uses a dedicated Cloud Run runtime service account and Application Default Credentials; no service-account JSON key is stored in this repository.
+
+## Product behavior
+
+The MVP is designed around a strict separation between deterministic business truth and advisory AI.
+
+### Deterministic layer
+
+The application calculates operational facts and issue severity in code. The LLM is not allowed to calculate or override authoritative business truth.
+
+For the canonical `SO-001` scenario, the application derives:
+
+- Order quantity: **500 pcs**
+- Completed production: **150 pcs**
+- Completion: **30%**
+- Remaining production: **350 pcs**
+- Required material: **500 pcs**
+- Available material: **300 pcs**
+- Material shortage: **200 pcs**
+- Deadline: **2 days remaining**
+
+### AI advisory layer
+
+Gemini receives only bounded issue context and approved evidence. AI output is constrained to structured advisory content and is validated again locally before anything can be persisted.
+
+The AI must not:
+
+- invent operational facts;
+- override issue type or severity;
+- cite unknown evidence;
+- claim an external action already happened;
+- automatically contact suppliers or customers;
+- bypass human approval.
+
+### Human Gate
+
+Suggested actions remain internal drafts until a human explicitly approves, edits, or rejects them. Approval does **not** trigger an external email, order update, supplier contact, or autonomous execution.
+
+## Golden-path demo
+
+The intended demonstration flow is:
+
+1. Open the landing page and choose **Try Demo**.
+2. Load the persisted canonical demo workspace.
+3. Review the dashboard baseline:
+   - 12 Orders
+   - 5 At Risk
+   - 5 Material Shortages
+   - 2 Critical Issues
+4. Open **SO-001 may miss its deadline**.
+5. Verify deterministic facts before AI:
+   - Critical
+   - 30% complete
+   - 350 pcs remaining
+   - 200 pcs material shortage
+   - 2 days remaining
+6. Select **Analyze with AI**.
+7. Review the grounded recommendation.
+8. Approve, edit, or reject the suggested internal action.
+9. Open **Activity** and verify the audit trail.
+10. Refresh the application and confirm persistence survives reload.
+
+At the time of this README update, step 6 is the active live-cloud blocker and is being diagnosed with safe server-side instrumentation.
 
 ## Architecture
 
-Next.js App Router with `src/`, React, strict TypeScript, Tailwind CSS, and Zod. The locked target includes CSV/XLSX import, a deterministic operations engine, issue evidence, Gemini via Google Gen AI SDK, human approval, Firestore, and Google Cloud Run (P0). Firebase Authentication is planned; Google Sheets read-only integration is P1. See [ARCHITECTURE.md](ARCHITECTURE.md) for target versus implemented status.
+```text
+Browser / Responsive Web UI
+        │
+        ▼
+Next.js App Router + Server Actions
+        │
+        ├── Import pipeline
+        │     CSV / XLSX
+        │     → preview
+        │     → mapping
+        │     → normalize / validate
+        │     → reviewed save
+        │
+        ├── Deterministic operations engine
+        │     → facts
+        │     → issues
+        │     → severity
+        │     → evidence
+        │
+        ├── AI advisory boundary
+        │     → bounded evidence input
+        │     → Gemini on Vertex AI
+        │     → structured response
+        │     → Zod validation
+        │     → grounding validation
+        │     → allowed-action validation
+        │
+        ├── Human Gate
+        │     → suggested
+        │     → edit / approve / reject
+        │
+        └── Firestore persistence
+              → workspace
+              → analyses
+              → actions
+              → audit events
+```
+
+## Technology stack
+
+- **Next.js 16.4** / React 19
+- **TypeScript 6**
+- **Tailwind CSS 4**
+- **Zod 4**
+- **Google Gen AI SDK (`@google/genai`)**
+- **Google Cloud Firestore**
+- **Google Cloud Run**
+- **Papa Parse** for CSV
+- **ExcelJS** for XLSX
+- **Vitest** for automated verification
 
 ## Local development
 
-Use Node.js 24 LTS (validated with 24.19.0) and npm. From the repository root:
+### Requirements
+
+- Node.js **24.x**
+- npm
+
+Install dependencies:
 
 ```bash
 npm ci
+```
+
+Start development:
+
+```bash
 npm run dev
 ```
 
-The development server defaults to port 3000. No external service or credential is required for WU-00. In the managed cloud environment, use a writable npm cache if the default home cache is unavailable: `export npm_config_cache=/workspace/.npm-cache`.
+Quality checks:
+
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Available scripts:
 
 | Script | Purpose |
 | --- | --- |
-| `npm run dev` | Start development server |
-| `npm run build` | Build production application |
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Create the production build |
 | `npm start` | Serve the production build |
-| `npm run lint` | ESLint checks |
-| `npm run typecheck` | Explicit `tsc --noEmit` |
-| `npm test` | Run rendering smoke tests once |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run `tsc --noEmit` |
+| `npm test` | Run the Vitest test suite |
 
-Run lint, typecheck, tests, and build before WU-00 review. Commit the npm lockfile and use `npm ci` for reproducible installs.
+## Cloud configuration
 
-## Environment-variable policy
+Server-side Vertex AI requires:
 
-`.env.example` is a documentation template with empty future-variable placeholders. The foundation consumes none of them. Never commit credentials or real `.env` files; `.env*` is ignored except `.env.example`. Future services must introduce their requirements within the relevant gated Work Unit.
+```text
+GOOGLE_CLOUD_PROJECT=
+GOOGLE_CLOUD_LOCATION=
+GEMINI_MODEL=
+```
 
-## Freshness and scope boundaries
+Firestore uses `GOOGLE_CLOUD_PROJECT` plus Application Default Credentials / the Cloud Run runtime identity.
 
-This is newly authored foundation code; do not copy prior BukuLokal, Urban & Corp Business OS, ACE, proprietary UI/assets, test fixtures, environment files, or implementation schemas. Retain Git provenance and the existing LICENSE. WU-00 ends at the foundation; later Work Units require independent gates and the canonical PRD. Do not implement WU-01 during bootstrap.
+See `.env.example` for the documented environment contract.
 
-## Governance
+Never commit:
 
-- [FRESHNESS.md](FRESHNESS.md): observed provenance and freshness boundary
-- [DECISIONS.md](DECISIONS.md): approved ADR-001 through ADR-012
-- [PRD.md](PRD.md): complete canonical owner-approved build baseline
-- [ARCHITECTURE.md](ARCHITECTURE.md): locked target and current implementation
-- [CHANGELOG.md](CHANGELOG.md): factual changes
-- [LICENSE](LICENSE): original repository license
+- service-account JSON keys;
+- access tokens;
+- real `.env` files;
+- cloud credentials;
+- customer secrets.
+
+## Persistence and safety model
+
+The production composition uses Firestore-backed persistence. The application does not silently fall back to an in-memory fake database in production.
+
+Key safeguards include:
+
+- organization-scoped document paths;
+- validated canonical identifiers;
+- explicit reference validation;
+- atomic writes where required;
+- no implicit overwrite during imports;
+- safe duplicate/conflict behavior;
+- persisted analysis, suggestions, decisions, and audit history;
+- no automatic deletion of decision history to hide failures.
+
+## AI diagnostics
+
+The current deployment includes safe server-side diagnostics for the live AI path. Diagnostics can distinguish failures across:
+
+- provider request;
+- provider transport;
+- provider response;
+- JSON parsing;
+- Zod schema validation;
+- grounding validation;
+- action compatibility;
+- record validation;
+- input validation;
+- persistence.
+
+Diagnostics intentionally exclude raw prompts, full evidence payloads, full model output, credentials, access tokens, and service-account secrets.
+
+The current observed live failure is:
+
+```text
+stage: provider_request
+errorCode: AI_PROVIDER_ERROR
+providerStatus: 400
+sdkErrorName: ApiError
+model: gemini-3.5-flash
+promptVersion: issue-analysis-v1
+```
+
+This means the current blocker occurs before response parsing, grounding validation, action compatibility, or persistence.
+
+## Repository governance
+
+This project was created as a fresh standalone hackathon implementation. It does not submit prior BukuLokal / Urban & Corp Business OS production code or proprietary historical assets as the hackathon solution.
+
+Development follows evidence-based work units and explicit gates. A passing local test suite is not treated as proof of live-cloud behavior; live Firestore, Vertex AI, and Cloud Run behavior are verified separately.
+
+Key documents:
+
+- [PRD.md](PRD.md) — canonical product baseline
+- [ARCHITECTURE.md](ARCHITECTURE.md) — architecture and implementation boundaries
+- [DECISIONS.md](DECISIONS.md) — architecture decision records
+- [CHANGELOG.md](CHANGELOG.md) — project changes
+- [FRESHNESS.md](FRESHNESS.md) — fresh-project provenance boundary
+- [docs/demo-runbook.md](docs/demo-runbook.md) — deterministic demo procedure
+- [docs/end-to-end-golden-path.md](docs/end-to-end-golden-path.md) — integrated golden-path design
+- [docs/evidence/WU-10A-vertex-schema-compatibility.md](docs/evidence/WU-10A-vertex-schema-compatibility.md) — Vertex structured-schema investigation evidence
+
+## Current next step
+
+The next engineering step is to isolate the exact production Vertex request field or schema combination responsible for the HTTP 400 response, then re-run the complete live golden path:
+
+```text
+Data
+→ deterministic issue
+→ grounded Gemini analysis
+→ suggested action
+→ human approval
+→ Activity audit
+→ refresh durability
+```
+
+Only after that live path succeeds should the deployment milestone be considered fully complete.
+
+## License
+
+See [LICENSE](LICENSE).
