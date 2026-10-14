@@ -18,7 +18,33 @@ function unsupportedKeywords(schema: unknown): string[] {
   ]);
 }
 
+const excludedForVerifiedPath = new Set(["$schema", "minLength", "maxLength", "pattern", "minItems", "maxItems"]);
+function compatibilityKeywords(value: unknown): string[] {
+  if (!value || typeof value !== "object") return [];
+  return Object.entries(value).flatMap(([key, child]) => [
+    ...(excludedForVerifiedPath.has(key) ? [key] : []), ...compatibilityKeywords(child),
+  ]);
+}
+
 describe("Vertex schema compatibility preserves local safeguards", () => {
+  it("omits all six compatibility keywords recursively from the provider-facing schema", () => {
+    expect(compatibilityKeywords(ISSUE_ANALYSIS_JSON_SCHEMA)).toEqual([]);
+  });
+  it.each([0, 1, 64, 65])("locally enforces reference cardinality for %i IDs at both locations", (count) => {
+    const refs = Array.from({ length: count }, (_, index) => `EVIDENCE-${index}`);
+    const output = validOutput();
+    const expected = count >= 1 && count <= 64;
+    expect(GeminiIssueAnalysisSchema.safeParse({ ...output, evidenceRefs: refs }).success).toBe(expected);
+    output.recommendations[0].evidenceRefs = refs;
+    expect(GeminiIssueAnalysisSchema.safeParse(output).success).toBe(expected);
+  });
+  it.each(["recommendations", "missingData", "cannotDetermine"] as const)("locally preserves the %s maximum", (field) => {
+    const output = validOutput();
+    const limit = field === "recommendations" ? 8 : 16;
+    const entry = output[field][0];
+    expect(GeminiIssueAnalysisSchema.safeParse({ ...output, [field]: Array.from({ length: limit }, () => entry) }).success).toBe(true);
+    expect(GeminiIssueAnalysisSchema.safeParse({ ...output, [field]: Array.from({ length: limit + 1 }, () => entry) }).success).toBe(false);
+  });
   it("uses only supported responseJsonSchema keywords at every schema node", () => {
     expect(unsupportedKeywords(ISSUE_ANALYSIS_JSON_SCHEMA)).toEqual([]);
   });
@@ -56,6 +82,9 @@ describe("Vertex schema compatibility preserves local safeguards", () => {
     const result = await analyzeIssue(selectedRequest(), provider, execution);
     expect(result.ok).toBe(true); expect(result.attempts).toBe(2);
     expect(provider.requests.map((request) => request.retry)).toEqual([false, true]);
-    for (const request of provider.requests) expect(unsupportedKeywords(request.responseJsonSchema)).toEqual([]);
+    for (const request of provider.requests) {
+      expect(unsupportedKeywords(request.responseJsonSchema)).toEqual([]);
+      expect(compatibilityKeywords(request.responseJsonSchema)).toEqual([]);
+    }
   });
 });
