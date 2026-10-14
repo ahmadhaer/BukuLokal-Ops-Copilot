@@ -4,6 +4,8 @@ import type { IssueAnalysisProvider, IssueAnalysisGenerationRequest } from "../a
 import { IssueAnalysisInputSchema, MAX_ANALYSIS_INPUT_BYTES } from "../analysis/input";
 import { AiAnalysisError } from "../analysis/errors";
 
+import { logAiDiagnostic, providerFailureStage, type DiagnosticStage } from "../analysis/diagnostics";
+
 const ConfigSchema = z.strictObject({ project: z.string().trim().min(1), location: z.string().trim().min(1), model: z.string().trim().min(1).regex(/^\S+$/) });
 export type VertexConfig = z.infer<typeof ConfigSchema>;
 export function readVertexConfig(env: Record<string, string | undefined> = process.env): VertexConfig {
@@ -18,6 +20,7 @@ export class GeminiIssueAnalysisProvider implements IssueAnalysisProvider {
     if (request.model !== this.config.model) throw new AiAnalysisError("AI_CONFIG_MISSING", "Analysis model must match the configured Vertex model.");
     const input = IssueAnalysisInputSchema.safeParse(request.input);
     if (!input.success || new TextEncoder().encode(JSON.stringify(input.data)).byteLength > MAX_ANALYSIS_INPUT_BYTES) throw new AiAnalysisError("AI_INPUT_INVALID", "Vertex request must contain only bounded selected issue evidence.");
+    let stage: DiagnosticStage = "provider_request";
     try {
       const response = await this.client.models.generateContent({ model: request.model,
         contents: [{ role: "user", parts: [{ text: JSON.stringify(input.data) }] }],
@@ -25,9 +28,11 @@ export class GeminiIssueAnalysisProvider implements IssueAnalysisProvider {
           responseJsonSchema: request.responseJsonSchema, temperature: 0, candidateCount: 1,
           maxOutputTokens: 4_096, httpOptions: { retryOptions: { attempts: 1 }, timeout: 30_000 } },
       });
+      stage = "provider_response";
       if (response.functionCalls?.length) throw new AiAnalysisError("AI_INVALID_RESPONSE", "Tool calls are not permitted in advisory analysis.");
       return response.text ?? "";
     } catch (error) {
+      logAiDiagnostic(providerFailureStage(error, stage), error instanceof AiAnalysisError ? error.errorCode : "AI_PROVIDER_ERROR", { model: request.model, promptVersion: request.promptVersion, attempt: request.retry ? 2 : 1 }, error);
       if (error instanceof AiAnalysisError) throw error;
       throw new AiAnalysisError("AI_PROVIDER_ERROR", "Vertex AI request failed; deterministic data remains available.");
     }

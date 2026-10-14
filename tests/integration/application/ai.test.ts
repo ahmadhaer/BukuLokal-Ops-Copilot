@@ -1,7 +1,20 @@
-import { describe,expect,it } from "vitest";
+import { describe,expect,it,vi } from "vitest";
 import { buildTestApplication,goldenIssue,TestProvider,OPERATION,NEXT_OPERATION } from "./helpers";
 import { loadWorkspace } from "../../../src/features/persistence/workspace";
+import { PersistenceError } from "../../../src/lib/firestore/errors";
 describe("atomic analysis orchestration and replay",()=>{
+  it("logs persistence failure after valid AI without exposing diagnostics to the browser",async()=>{
+    const {application,repository}=buildTestApplication();const issueId=await goldenIssue(application);
+    const log=vi.spyOn(console,"warn").mockImplementation(()=>{});
+    const batch=vi.spyOn(repository,"batch").mockRejectedValue(new PersistenceError("PERSISTENCE_WRITE_FAILED","Workspace storage is temporarily unavailable. Please try again."));
+    try {
+      const response=await application.analyzeIssue(issueId,OPERATION);
+      expect(response).toEqual({status:"unavailable",message:"Workspace storage is temporarily unavailable. Please try again."});
+      expect(JSON.parse(log.mock.calls[0][0] as string)).toMatchObject({stage:"persistence",errorCode:"PERSISTENCE_WRITE_FAILED",model:"synthetic-test-model",attempt:1});
+      expect(JSON.stringify(response)).not.toContain("PERSISTENCE_WRITE_FAILED");
+      expect((await loadWorkspace(repository,"ORG-001")).aiAnalyses).toHaveLength(0);
+    } finally {batch.mockRestore();log.mockRestore();}
+  });
   it("validates bounded persisted input and commits analysis/suggestion/audits together",async()=>{
     const {application,provider,repository}=buildTestApplication();const issueId=await goldenIssue(application);const response=await application.analyzeIssue(issueId,OPERATION);expect(response.status).toBe("success");const data=await loadWorkspace(repository,"ORG-001");
     expect(provider.requests).toHaveLength(1);expect(provider.requests[0].input.issue).toMatchObject({issueId,severity:"critical"});expect(provider.requests[0].input.evidence.map(x=>x.value)).toEqual(expect.arrayContaining([30,200,2]));expect(data.aiAnalyses).toHaveLength(1);expect(data.actions[0].status).toBe("suggested");expect(data.actions[0].approvedBy).toBeNull();expect(data.auditEvents.map(x=>x.event).sort()).toEqual(["action_suggested","ai_analysis_completed"]);

@@ -6,6 +6,7 @@ import type { WorkspaceRepository } from "../repositories/types";
 import type { IssueAnalysisProvider } from "../ai/analysis/provider";
 import { analyzeIssue } from "../ai/analysis/analyze-issue";
 import { buildIssueAnalysisInput } from "../ai/analysis/input";
+import { logAiDiagnostic } from "../ai/analysis/diagnostics";
 import { PROMPT_VERSION } from "../ai/prompts/issue-analysis-v1";
 import { ensureDemoWorkspace, loadWorkspace, workspaceView } from "../features/persistence/workspace";
 import { restoreSession, suggestPersistedAction, transitionPersistedAction } from "../features/persistence/human-gate";
@@ -76,7 +77,11 @@ export function buildApplication(deps: ApplicationDependencies) {
         const createdAt = deps.now(); const analysis = await analyzeIssue(request, runtime.provider, { model: runtime.model, createdAt });
         if (!analysis.ok) return { status: "unavailable", message: "AI analysis could not be validated or the provider is unavailable. Evidence remains visible; retry is available." };
         try { await persistValidatedAnalysis(repository, org, analysis.record, { organizationId: org, actor: "demo-owner", occurredAt: createdAt, sequence: data.auditEvents.length }, analysis.analysis.recommendations.map((_, index) => index), operationId); }
-        catch (error) { if (error instanceof PersistenceError && error.code === "PERSISTENCE_CONFLICT") { const winner = await replay(); if (winner) return winner; } throw error; }
+        catch (error) {
+          logAiDiagnostic("persistence", error instanceof PersistenceError ? error.code : "PERSISTENCE_WRITE_FAILED", { model: runtime.model, promptVersion: PROMPT_VERSION, attempt: analysis.attempts }, error);
+          if (error instanceof PersistenceError && error.code === "PERSISTENCE_CONFLICT") { const winner = await replay(); if (winner) return winner; }
+          throw error;
+        }
         return { status: "success", result: analysis, input };
       } catch (error) { return { status: "unavailable", message: applicationFailure(error).message }; }
     })();
