@@ -17,8 +17,8 @@ describe("real Vertex adapter request contract (no network)", () => {
     expect(JSON.parse(await provider.generate(generation()))).toHaveProperty("summary");
     const call = generateContent.mock.calls[0][0];
     expect(call.model).toBe(execution.model);
-    expect(call.config).toMatchObject({ systemInstruction: SYSTEM_INSTRUCTION, responseMimeType: "application/json", responseJsonSchema: ISSUE_ANALYSIS_JSON_SCHEMA, temperature: 0, candidateCount: 1, httpOptions: { retryOptions: { attempts: 1 } } });
-    expect(call.config).not.toHaveProperty("tools"); expect(call.config).not.toHaveProperty("toolConfig");
+    expect(call.config).toMatchObject({ systemInstruction: SYSTEM_INSTRUCTION, responseMimeType: "application/json", responseJsonSchema: ISSUE_ANALYSIS_JSON_SCHEMA, temperature: 0, candidateCount: 1, maxOutputTokens: 4_096, httpOptions: { retryOptions: { attempts: 2, initialDelay: 1, maxDelay: 2, expBase: 2, jitter: 0, httpStatusCodes: [408, 429, 500, 503, 504] }, timeout: 30_000 } });
+    expect(call.config).not.toHaveProperty("thinkingConfig"); expect(call.config).not.toHaveProperty("tools"); expect(call.config).not.toHaveProperty("toolConfig");
     expect(JSON.stringify(call.contents)).not.toContain("workbook"); expect(JSON.stringify(call.contents)).not.toContain("customerName");
     expect(JSON.stringify(call.contents)).toContain(selectedRequest().issueId);
   });
