@@ -1,0 +1,6 @@
+{
+  "measurement": "Landing to first meaningful validated recommendation",
+  "elapsed_ms": 295.81859199999997,
+  "provider": "explicit test network double",
+  "live_network_latency_measured": false
+}

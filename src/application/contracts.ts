@@ -1,0 +1,11 @@
+import type { DemoViewModel } from "../features/demo/workspace";
+import type { SessionState } from "../features/persistence/contracts";
+import type { Order } from "../domain";
+import type { OrderOperationalFacts } from "../domain/operations/types";
+export type RuntimeCapabilities = { persistence: "configured" | "unavailable"; ai: "configured" | "unavailable" };
+export type ApplicationHealth = { applicationReady: boolean; goldenPathReady: boolean; capabilities: RuntimeCapabilities };
+export type ApplicationFailure = { ok: false; code: string; message: string };
+export type ApplicationResult<T> = { ok: true; value: T } | ApplicationFailure;
+export type WorkspaceSnapshot = { workspace: DemoViewModel; state: SessionState; capabilities: RuntimeCapabilities };
+export type IssueSnapshot = WorkspaceSnapshot & { order: Order; facts: OrderOperationalFacts };
+export type ImportSaveResponse = { ok: true; savedRecords: number; invalidRows: number; message: string } | ApplicationFailure;

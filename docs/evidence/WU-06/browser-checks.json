@@ -1,0 +1,74 @@
+{
+  "browser": [
+    {
+      "title": "BukuLokal Ops Copilot",
+      "heading": "Operations overview",
+      "width": 1280,
+      "scroll": 1265,
+      "text": "Skip to content\nBukuLokal\nOPS COPILOT\nData\nDashboard\nIssues\nActions\nActivity\n\nABC Apparel Manufacturing \u00b7 Fictional demo \u00b7 As of 2026-10-12\n\nOperations overview\n\nSee what needs attention, then review the verified evidence.\n\nOrders\n\n12\n\nAt Risk\n\n5\n\nMaterial Shortages\n\n5\n\nCritical Issues\n\n2\n\nNeeds Your Attention\nCritical\nMaterial Shortage\nSO-001 needs additional material\nMaterial shortage: 200 pcs\nTime remaining: 2 days\nReview Issue\nCritical\nOrder Delay\nSO-001 may miss its deadline\nTime remaining: 2 days\nProduction complete: 30%\nMaterial shortage: 200 pcs\nReview Issue\nHigh\nMaterial Shortage\nSO-003 needs additional material\nMaterial shortage: 100 pcs\nTime remaining: 3 days\nReview Issue\nHigh\nOrder Delay\nSO-003 may miss its deadline\nTime remaining: 3 days\nProduction complete: 40%\nReview Issue\nMedium\nMaterial Shortage\nSO-007 needs additional material\nMaterial shortage: 30 pcs\nTime remaining: 4 days\nReview Issue\nMedium\nOrder Delay\nSO-007 may miss its deadline\nTime remaining: 4 days\nProduction complete: 50%\nReview Issue\nMedium\nMaterial Shortage\nSO-010 needs additional material\nMaterial shortage: 75 pcs\nTime remaining: 6 days\nReview Issue\nMedium\nOrder Delay\nSO-010 may miss its deadline\nTime remaining: 6 days\nProduction complete: 33.33%\nReview Issue\nMedium\nOrder Delay\nSO-012 may miss its deadline\nTime remaining: 7 days\nProduction complete: 57.14%\nReview Issue\nLow\nMaterial Shortage\nSO-006 needs additional material\nMaterial shortage: 400 pcs\nTime remaining: 8 days\nReview Issue\n\nDemo owner is a synthetic actor; sign-in is not implemented. Refresh may reset Human Gate state until persistence is implemented.\n\nNo messages, orders, or external systems are changed by approval.",
+      "unlabelled": 0,
+      "screenshot": "dashboard-desktop.png",
+      "path": "/demo"
+    },
+    {
+      "title": "BukuLokal Ops Copilot",
+      "heading": "Operations overview",
+      "width": 390,
+      "scroll": 390,
+      "text": "Skip to content\nBukuLokal\nOPS COPILOT\nData\nDashboard\nIssues\nActions\nActivity\n\nABC Apparel Manufacturing \u00b7 Fictional demo \u00b7 As of 2026-10-12\n\nOperations overview\n\nSee what needs attention, then review the verified evidence.\n\nOrders\n\n12\n\nAt Risk\n\n5\n\nMaterial Shortages\n\n5\n\nCritical Issues\n\n2\n\nNeeds Your Attention\nCritical\nMaterial Shortage\nSO-001 needs additional material\nMaterial shortage: 200 pcs\nTime remaining: 2 days\nReview Issue\nCritical\nOrder Delay\nSO-001 may miss its deadline\nTime remaining: 2 days\nProduction complete: 30%\nMaterial shortage: 200 pcs\nReview Issue\nHigh\nMaterial Shortage\nSO-003 needs additional material\nMaterial shortage: 100 pcs\nTime remaining: 3 days\nReview Issue\nHigh\nOrder Delay\nSO-003 may miss its deadline\nTime remaining: 3 days\nProduction complete: 40%\nReview Issue\nMedium\nMaterial Shortage\nSO-007 needs additional material\nMaterial shortage: 30 pcs\nTime remaining: 4 days\nReview Issue\nMedium\nOrder Delay\nSO-007 may miss its deadline\nTime remaining: 4 days\nProduction complete: 50%\nReview Issue\nMedium\nMaterial Shortage\nSO-010 needs additional material\nMaterial shortage: 75 pcs\nTime remaining: 6 days\nReview Issue\nMedium\nOrder Delay\nSO-010 may miss its deadline\nTime remaining: 6 days\nProduction complete: 33.33%\nReview Issue\nMedium\nOrder Delay\nSO-012 may miss its deadline\nTime remaining: 7 days\nProduction complete: 57.14%\nReview Issue\nLow\nMaterial Shortage\nSO-006 needs additional material\nMaterial shortage: 400 pcs\nTime remaining: 8 days\nReview Issue\n\nDemo owner is a synthetic actor; sign-in is not implemented. Refresh may reset Human Gate state until persistence is implemented.\n\nNo messages, orders, or external systems are changed by approval.",
+      "unlabelled": 0,
+      "screenshot": "dashboard-mobile.png",
+      "path": "/demo"
+    },
+    {
+      "title": "BukuLokal Ops Copilot",
+      "heading": "Upload and review",
+      "width": 768,
+      "scroll": 768,
+      "text": "Skip to content\nBukuLokal\nOPS COPILOT\nData\nDashboard\nIssues\nActions\nActivity\n\nABC Apparel Manufacturing \u00b7 Fictional demo \u00b7 As of 2026-10-12\n\nUSE YOUR DATA\n\nUpload and review\n\nPreview a file, confirm its columns, and see which rows are ready.\n\nUpload File\nCSV or Excel file\n\nMaximum file size: 5 MB \u00b7 up to 5,000 rows\n\nImport Preview\n\nDemo owner is a synthetic actor; sign-in is not implemented. Refresh may reset Human Gate state until persistence is implemented.\n\nNo messages, orders, or external systems are changed by approval.",
+      "unlabelled": 0,
+      "screenshot": "import-tablet.png",
+      "path": "/import"
+    },
+    {
+      "title": "BukuLokal Ops Copilot",
+      "heading": "SO-001 may miss its deadline",
+      "width": 1280,
+      "scroll": 1265,
+      "text": "Skip to content\nBukuLokal\nOPS COPILOT\nData\nDashboard\nIssues\nActions\nActivity\n\nABC Apparel Manufacturing \u00b7 Fictional demo \u00b7 As of 2026-10-12\n\nCritical\nSO-001 may miss its deadline\nWhat is happening?\n\nSO-001 may miss its deadline.\n\nWhy was this detected?\n\nVERIFIED OPERATIONAL EVIDENCE \u00b7 COMPUTED FROM DEMO DATA\n\nTime remaining\n\n2 days\n\nProduction complete\n\n30%\n\nMaterial shortage\n\n200 pcs\n\nAI Analysis\n\nAI recommendations are advisory. Verified evidence above remains authoritative.\n\nAnalyze with AI\n\nAI analysis is not configured in this environment. The operational issue and evidence remain available.\n\nHuman review\n\nNothing will be sent automatically.\n\nNo suggested actions yet.\n\nDemo owner is a synthetic actor; sign-in is not implemented. Refresh may reset Human Gate state until persistence is implemented.\n\nNo messages, orders, or external systems are changed by approval.",
+      "unlabelled": 0,
+      "screenshot": "issues-desktop.png",
+      "path": "/issues"
+    }
+  ],
+  "http": [
+    {
+      "route": "/",
+      "status": 200
+    },
+    {
+      "route": "/data",
+      "status": 200
+    },
+    {
+      "route": "/demo",
+      "status": 200
+    },
+    {
+      "route": "/issues",
+      "status": 200
+    },
+    {
+      "route": "/actions",
+      "status": 200
+    },
+    {
+      "route": "/activity",
+      "status": 200
+    },
+    {
+      "route": "/import",
+      "status": 200
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "source_files_scanned": 218,
+  "source_secret_hits": [],
+  "client_chunks_scanned": 14,
+  "client_server_sdk_config_hits": [],
+  "server_only_modules_checked": 18,
+  "missing_server_only_marker": [],
+  "production_memory_imports": [],
+  "protected_source_diff": "",
+  "existing_lock_versions_changed": [],
+  "firestore_sdk": "9.3.1",
+  "firestore_emulator_test": "NOT_RUN_UNAVAILABLE",
+  "live_golden_path_smoke_test": "NOT_RUN_MISSING_CLOUD_CONFIG",
+  "network_database_calls": "none",
+  "remote_mutations": "none"
+}

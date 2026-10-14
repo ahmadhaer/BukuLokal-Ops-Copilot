@@ -1,0 +1,110 @@
+Skip to content
+BukuLokal
+OPS COPILOT
+Data
+Dashboard
+Issues
+Actions
+Activity
+
+ABC Apparel Manufacturing · Fictional demo · As of 2026-10-12
+
+USE YOUR DATA
+
+Upload and review
+
+Preview a file, confirm its columns, and see which rows are ready.
+
+Upload File
+CSV or Excel file
+
+Maximum file size: 5 MB · up to 5,000 rows
+
+Import Preview
+Import Preview
+
+orders.csv · 1 data rows
+
+Detected columns: No PO, Customer, Nama Barang, Jumlah, Deadline, Status
+
+Suggested data type: orders
+
+Data type
+Choose data type
+Orders
+Production
+Inventory
+Review Mapping
+
+Your column → BukuLokal field. Suggestions require your confirmation.
+
+No PO
+Leave unmapped
+Record Number
+Customer
+Product
+Ordered Quantity
+Quantity Unit
+Due Date
+Order Status
+Customer
+Leave unmapped
+Record Number
+Customer
+Product
+Ordered Quantity
+Quantity Unit
+Due Date
+Order Status
+Nama Barang
+Leave unmapped
+Record Number
+Customer
+Product
+Ordered Quantity
+Quantity Unit
+Due Date
+Order Status
+Jumlah
+Leave unmapped
+Record Number
+Customer
+Product
+Ordered Quantity
+Quantity Unit
+Due Date
+Order Status
+Deadline
+Leave unmapped
+Record Number
+Customer
+Product
+Ordered Quantity
+Quantity Unit
+Due Date
+Order Status
+Status
+Leave unmapped
+Record Number
+Customer
+Product
+Ordered Quantity
+Quantity Unit
+Due Date
+Order Status
+Explicit default quantity unit (only when no column is mapped)
+Use mapped unit
+pcs
+kg
+unit
+I confirm these mappings and explicit defaults.
+Confirm Mapping and Check Data
+Data Health
+
+1 rows ready · 0 rows need attention
+
+Preview only. These records are not saved or added to the demo dashboard.
+
+Demo owner is a synthetic actor; sign-in is not implemented. Refresh may reset Human Gate state until persistence is implemented.
+
+No messages, orders, or external systems are changed by approval.

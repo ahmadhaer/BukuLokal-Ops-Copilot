@@ -1,0 +1,67 @@
+[
+  {
+    "command": "npm ci",
+    "exit_code": 0,
+    "output": "npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.\nnpm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn deprecated fstream@1.0.12: This package is no longer supported.\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\nnpm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.\n\nadded 644 packages in 8s\n"
+  },
+  {
+    "command": "npm run lint",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 lint\n> eslint .\n\n"
+  },
+  {
+    "command": "npm run typecheck",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 typecheck\n> tsc --noEmit\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/composition.test.ts",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/composition.test.ts\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  08:40:46\n   Duration  635ms (import 53%, transform 41%, tests 5%)\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/demo.test.ts",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/demo.test.ts\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  7 passed (7)\n   Start at  08:40:47\n   Duration  393ms (import 59%, tests 20%, transform 20%, worker 1%)\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/ai.test.ts",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/ai.test.ts\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  8 passed (8)\n   Start at  08:40:48\n   Duration  472ms (import 49%, tests 30%, transform 19%, worker 1%)\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/human-gate.test.ts",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/human-gate.test.ts\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  6 passed (6)\n   Start at  08:40:48\n   Duration  533ms (import 44%, tests 41%, transform 14%, worker 1%)\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/imports.test.ts",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/imports.test.ts\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  5 passed (5)\n   Start at  08:40:49\n   Duration  435ms (import 60%, transform 20%, tests 19%, worker 1%)\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/security.test.ts",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/security.test.ts\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  08:40:50\n   Duration  370ms (import 61%, transform 21%, tests 17%, worker 2%)\n\n"
+  },
+  {
+    "command": "npm test -- tests/integration/application/golden-flow.test.tsx",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run tests/integration/application/golden-flow.test.tsx\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  08:40:50\n   Duration  1.39s (tests 41%, environment 23%, import 18%, transform 18%)\n\n"
+  },
+  {
+    "command": "npm test",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 test\n> vitest run\n\n\n RUN  v5.0.4 /workspace/BukuLokal-Ops-Copilot\n\n\n Test Files  44 passed (44)\n      Tests  389 passed (389)\n   Start at  08:40:52\n   Duration  5.86s (import 43%, tests 34%, environment 13%, transform 9%, worker 1%)\n\n     Import  146 modules were evaluated 494 times \u00b7 5.82s total, 43% of tracked time\n             ~723ms faster with isolate: false \u2014 shared modules are evaluated once per worker instead of once per file\n             learn more: https://vitest.dev/guide/improving-performance#test-isolation\n\n"
+  },
+  {
+    "command": "npm run build",
+    "exit_code": 0,
+    "output": "\n> bukulokal-ops-copilot@0.1.0 build\n> next build\n\n\u25b2 Next.js 16.4.0 (Turbopack)\n\u2713 Running next.config.ts took 16ms\n- Experiments (use with caution):\n  \u00b7 serverActions\n\n  Creating an optimized production build ...\n\u2713 Compiled successfully in 393ms\n  Running TypeScript ...\n  Finished TypeScript in 1585ms ...\n  Collecting page data using 4 workers ...\n  Generating static pages using 4 workers (0/9) ...\n  Generating static pages using 4 workers (2/9) \n  Generating static pages using 4 workers (4/9) \n  Generating static pages using 4 workers (6/9) \n\u2713 Generating static pages using 4 workers (9/9) in 129ms\n  Finalizing page optimization ...\n\nRoute (app)\n\u250c \u25cb /\n\u251c \u25cb /_not-found\n\u251c \u0192 /actions\n\u251c \u0192 /activity\n\u251c \u0192 /data\n\u251c \u0192 /demo\n\u251c \u0192 /import\n\u251c \u0192 /issues\n\u2514 \u0192 /issues/[id]\n\n\n\u25cb  (Static)   prerendered as static content\n\u0192  (Dynamic)  server-rendered on demand\n\n"
+  },
+  {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "output": ""
+  }
+]
