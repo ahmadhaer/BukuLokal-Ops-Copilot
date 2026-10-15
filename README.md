@@ -8,41 +8,46 @@ BukuLokal Ops Copilot is a fresh standalone hackathon prototype for small-manufa
 
 This repository is intentionally scoped as an operations copilot rather than a full ERP or a generic chatbot.
 
-## Current MVP status
+## Current development status
 
-The application MVP is implemented and deployed to Google Cloud Run. The deterministic operational path, persistence, import workflow, Human Gate, and diagnostic instrumentation are working. The remaining active blocker is the live in-application Gemini request path: the application currently receives a Vertex AI `400 ApiError` at the provider-request stage. Direct Vertex Gemini smoke tests succeed, so the current investigation is focused on the exact production request payload rather than model availability, Firestore, networking, or IAM.
+The MVP is implemented and deployed to Google Cloud Run. The deterministic operations path, CSV/XLSX import workflow, Firestore persistence, Human Gate, activity/audit reconstruction, Vertex AI integration, and safe server-side AI diagnostics are implemented.
 
-| Capability | Status |
+The original live Vertex `400 INVALID_ARGUMENT` blocker has been isolated and mitigated. The exact production response schema was accepted only after provider-facing array cardinality constraints (`minItems` / `maxItems`) were omitted; the authoritative Zod constraints remain enforced locally. Provider latency has also shown intermittent `504 DEADLINE_EXCEEDED`, so the current code uses one bounded SDK retry for transient HTTP failures while preserving a 30-second timeout per attempt.
+
+The live application has successfully produced and persisted an AI recommendation. The remaining work before closing WU-10 is now primarily **demo-state / UX clarity and final live golden-path verification**, not basic cloud connectivity.
+
+### Work-unit status
+
+| Work unit / capability | Status |
 | --- | --- |
-| Responsive Next.js application | ✅ Implemented |
-| CSV / XLSX import preview, mapping, validation, and reviewed save | ✅ Implemented |
-| Deterministic operational calculations | ✅ Implemented |
-| Issue detection and canonical evidence | ✅ Implemented |
-| SO-001 deterministic golden-path facts | ✅ Implemented |
-| Firestore persistence | ✅ Live verified |
-| Human approval / edit / reject gate | ✅ Implemented |
-| Activity / audit history and refresh durability | ✅ Implemented locally and persistence-backed |
-| Cloud Run deployment | ✅ Live |
-| Direct Vertex Gemini structured-output smoke test | ✅ Live verified |
-| Safe server-side AI diagnostics | ✅ Deployed |
-| In-application Gemini analysis | ⚠️ Active diagnosis — Vertex provider request returns HTTP 400 |
-| Google Sheets integration | ⏸ Deferred to P1 |
-| External autonomous execution | ❌ Intentionally not implemented |
-| Authentication | ❌ Not part of the current hackathon MVP |
+| WU-00–WU-08 core MVP | ✅ PASS |
+| WU-09 Google Sheets integration | ⏸ Deferred to P1 |
+| WU-10A Vertex schema compatibility | ✅ PASS |
+| WU-10B safe AI diagnostics | ✅ PASS |
+| WU-10C array-constraint compatibility fix | ✅ PASS |
+| WU-10D bounded transient retry | ✅ PASS |
+| WU-10E persisted-AI-state UX clarification | 🟡 Planned / not yet implemented |
+| Final live golden-path closure | 🟡 In progress |
+| WU-11 final QA / submission readiness | ⏳ Pending |
 
-### Verification baseline
+### Current verified code baseline
 
-Latest local verification on the active deployment branch:
+Latest verified code commit before this documentation-only status update:
 
-- **410 tests passed across 46 files**
+```text
+b99a29a239622f5caf199d6aa2b82a34cb4f2139
+fix: bound Vertex transient retries to two attempts
+```
+
+Latest local verification reported for that code baseline:
+
+- **430 tests passed across 47 files**
 - `npm run lint` — PASS
 - `npm run typecheck` — PASS
 - `npm run build` — PASS
-- Cloud Run revision with AI diagnostics deployed
-- Firestore live create/read/delete smoke test — PASS
-- Direct Vertex Gemini `gemini-3.5-flash` smoke test — PASS
+- `git diff --check` — PASS
 
-The current working branch is:
+The active development branch is:
 
 ```text
 wu/10-google-cloud-live-deployment
@@ -57,6 +62,28 @@ https://bukulokal-ops-copilot-761334564667.asia-southeast2.run.app
 ```
 
 The service is public for hackathon demonstration purposes. It uses a dedicated Cloud Run runtime service account and Application Default Credentials; no service-account JSON key is stored in this repository.
+
+## Capability snapshot
+
+| Capability | Status |
+| --- | --- |
+| Responsive Next.js application | ✅ Implemented |
+| CSV / XLSX preview, mapping, validation, reviewed save | ✅ Implemented |
+| Deterministic operational calculations | ✅ Implemented |
+| Issue detection and canonical evidence | ✅ Implemented |
+| SO-001 deterministic golden-path facts | ✅ Implemented |
+| Firestore persistence | ✅ Live verified |
+| Human approval / edit / reject gate | ✅ Implemented |
+| Activity / audit history | ✅ Implemented |
+| Refresh durability | ✅ Persistence-backed |
+| Cloud Run deployment | ✅ Live |
+| Direct Vertex Gemini structured-output smoke test | ✅ Live verified |
+| Safe server-side AI diagnostics | ✅ Deployed |
+| In-application Gemini analysis | ✅ Has succeeded live; final repeatable golden-path closure still pending |
+| Bounded retry for transient Vertex failures | ✅ Implemented |
+| Google Sheets integration | ⏸ Deferred to P1 |
+| External autonomous execution | ❌ Intentionally not implemented |
+| Authentication | ❌ Not part of the current hackathon MVP |
 
 ## Product behavior
 
@@ -94,6 +121,60 @@ The AI must not:
 
 Suggested actions remain internal drafts until a human explicitly approves, edits, or rejects them. Approval does **not** trigger an external email, order update, supplier contact, or autonomous execution.
 
+## Live AI reliability work completed
+
+### WU-10A — schema compatibility
+
+The provider-facing schema sanitizer was tightened after Vertex rejected unsupported / incompatible JSON-schema keywords. This removed the earlier `pattern` compatibility issue while preserving authoritative local validation.
+
+### WU-10B — safe diagnostics
+
+Server-side diagnostics were added to classify failures across provider request/transport/response, parsing, schema validation, grounding, action compatibility, record validation, input validation, and persistence. Logs intentionally exclude prompts, full evidence payloads, model output, credentials, and raw sensitive provider messages.
+
+### WU-10C — array cardinality compatibility
+
+Controlled live probes showed:
+
+```text
+exact production schema                       → 400 INVALID_ARGUMENT
+without additionalProperties                  → 400 INVALID_ARGUMENT
+without minItems / maxItems                    → PASS
+without both groups                            → PASS
+```
+
+Therefore `minItems` and `maxItems` are omitted only from the provider-facing JSON schema. The authoritative Zod schema still enforces the original array bounds locally.
+
+### WU-10D — bounded transient retry
+
+Controlled tests showed that simply raising the timeout was not a deterministic fix: 30-second requests could succeed while a 60-second request could still fail with `504 DEADLINE_EXCEEDED`.
+
+The current retry policy is therefore deliberately bounded:
+
+```text
+timeout per HTTP attempt: 30,000 ms
+maximum attempts:         2 total
+initial delay:            1 second
+maximum delay:            2 seconds
+backoff factor:           2
+jitter:                   0
+retryable HTTP status:    408, 429, 500, 503, 504
+```
+
+Permanent / non-transient statuses such as 400, 401, 403, and 404 are not retried.
+
+## Current UX issue being addressed (WU-10E)
+
+A persisted successful AI analysis is intentionally restored from Firestore when the issue page is revisited. Today, the recommendation can therefore appear immediately while the button still says **Analyze with AI**. That behavior is technically correct persistence, but it is ambiguous for a reviewer because it can look as if AI ran automatically or the recommendation was pre-generated.
+
+WU-10E is planned to clarify that state without changing Firestore or AI contracts:
+
+- first-time issue: **Analyze with AI**;
+- persisted prior result: show **Previous AI analysis** and explain that it was restored from persistent storage;
+- after a result exists: button becomes **Analyze Again with AI**;
+- existing recommendation action: explain **Suggested action already created** instead of showing only a disabled control.
+
+No automatic reset or deletion of durable AI/action history is planned in this work unit.
+
 ## Golden-path demo
 
 The intended demonstration flow is:
@@ -112,13 +193,14 @@ The intended demonstration flow is:
    - 350 pcs remaining
    - 200 pcs material shortage
    - 2 days remaining
-6. Select **Analyze with AI**.
+6. Select **Analyze with AI** (or **Analyze Again with AI** when a prior analysis is restored).
 7. Review the grounded recommendation.
-8. Approve, edit, or reject the suggested internal action.
-9. Open **Activity** and verify the audit trail.
-10. Refresh the application and confirm persistence survives reload.
+8. Create a suggested internal action.
+9. Approve, edit, or reject it through the Human Gate.
+10. Open **Activity** and verify the audit trail.
+11. Refresh and verify that persisted analysis, action state, and audit history survive reload.
 
-At the time of this README update, step 6 is the active live-cloud blocker and is being diagnosed with safe server-side instrumentation.
+Final WU-10 closure requires this path to be demonstrated cleanly on the live deployment after WU-10E UX clarification.
 
 ## Architecture
 
@@ -249,41 +331,11 @@ Key safeguards include:
 - persisted analysis, suggestions, decisions, and audit history;
 - no automatic deletion of decision history to hide failures.
 
-## AI diagnostics
-
-The current deployment includes safe server-side diagnostics for the live AI path. Diagnostics can distinguish failures across:
-
-- provider request;
-- provider transport;
-- provider response;
-- JSON parsing;
-- Zod schema validation;
-- grounding validation;
-- action compatibility;
-- record validation;
-- input validation;
-- persistence.
-
-Diagnostics intentionally exclude raw prompts, full evidence payloads, full model output, credentials, access tokens, and service-account secrets.
-
-The current observed live failure is:
-
-```text
-stage: provider_request
-errorCode: AI_PROVIDER_ERROR
-providerStatus: 400
-sdkErrorName: ApiError
-model: gemini-3.5-flash
-promptVersion: issue-analysis-v1
-```
-
-This means the current blocker occurs before response parsing, grounding validation, action compatibility, or persistence.
-
 ## Repository governance
 
 This project was created as a fresh standalone hackathon implementation. It does not submit prior BukuLokal / Urban & Corp Business OS production code or proprietary historical assets as the hackathon solution.
 
-Development follows evidence-based work units and explicit gates. A passing local test suite is not treated as proof of live-cloud behavior; live Firestore, Vertex AI, and Cloud Run behavior are verified separately.
+Development follows evidence-based work units and explicit gates. A passing local test suite is not treated as proof of live-cloud behavior; Firestore, Vertex AI, and Cloud Run behavior are verified separately.
 
 Key documents:
 
@@ -294,23 +346,19 @@ Key documents:
 - [FRESHNESS.md](FRESHNESS.md) — fresh-project provenance boundary
 - [docs/demo-runbook.md](docs/demo-runbook.md) — deterministic demo procedure
 - [docs/end-to-end-golden-path.md](docs/end-to-end-golden-path.md) — integrated golden-path design
-- [docs/evidence/WU-10A-vertex-schema-compatibility.md](docs/evidence/WU-10A-vertex-schema-compatibility.md) — Vertex structured-schema investigation evidence
+- [docs/evidence/WU-10A-vertex-schema-compatibility.md](docs/evidence/WU-10A-vertex-schema-compatibility.md) — Vertex schema evidence
+- [docs/evidence/WU-10C-vertex-array-constraint-compatibility.md](docs/evidence/WU-10C-vertex-array-constraint-compatibility.md) — array-constraint compatibility evidence
+- [docs/evidence/WU-10D-bounded-vertex-retry.md](docs/evidence/WU-10D-bounded-vertex-retry.md) — bounded retry evidence
 
 ## Current next step
 
-The next engineering step is to isolate the exact production Vertex request field or schema combination responsible for the HTTP 400 response, then re-run the complete live golden path:
-
-```text
-Data
-→ deterministic issue
-→ grounded Gemini analysis
-→ suggested action
-→ human approval
-→ Activity audit
-→ refresh durability
-```
-
-Only after that live path succeeds should the deployment milestone be considered fully complete.
+1. Recover the Codex workspace onto the canonical branch / baseline if necessary.
+2. Implement WU-10E persisted-AI-state UX clarification.
+3. Re-run the full automated verification suite.
+4. Push and deploy the WU-10E revision.
+5. Run the complete live golden path, including Human Gate and refresh durability.
+6. Close WU-10 only after the live evidence passes.
+7. Move to WU-11 final QA, demo readiness, README finalization, and AI Builder Cup submission package.
 
 ## License
 
