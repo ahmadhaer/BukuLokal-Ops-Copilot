@@ -21,13 +21,16 @@ describe("product UI and AI states", () => {
     const analyze = vi.fn(fakeAnalyze); render(<Harness path={detailPath()} configured={false} analyze={analyze} />);
     expect(screen.getByText("30%")).toBeTruthy(); expect(screen.getByText("2 days")).toBeTruthy(); expect(screen.getByText("200 pcs")).toBeTruthy();
     expect(screen.getByText(/AI analysis is not configured/)).toBeTruthy(); expect((screen.getByRole("button", { name: "Analyze with AI" }) as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.queryByRole("heading", { name: "Summary" })).toBeNull(); expect(analyze).not.toHaveBeenCalled(); expect(document.querySelectorAll("[data-evidence-id]")).toHaveLength(3);
+    expect(screen.queryByText("Previous AI analysis")).toBeNull(); expect(screen.queryByRole("heading", { name: "Summary" })).toBeNull(); expect(analyze).not.toHaveBeenCalled(); expect(document.querySelectorAll("[data-evidence-id]")).toHaveLength(3);
   });
   it("renders fake-provider success only after explicit user action, including missing information", async () => {
     const user = userEvent.setup(); const analyze = vi.fn(fakeAnalyze); render(<Harness path={detailPath()} analyze={analyze} />); expect(analyze).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "Analyze with AI" })); await screen.findByRole("heading", { name: "Summary" });
     expect(screen.getByRole("heading", { name: "Why This Matters" })).toBeTruthy(); expect(screen.getByRole("heading", { name: "Recommended Actions" })).toBeTruthy();
     expect(screen.getByText(/Supplier lead time is not supplied/)).toBeTruthy(); expect(screen.getByText(/Production capacity is unavailable/)).toBeTruthy(); expect(analyze).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Analyze Again with AI" })).toBeTruthy();
+    expect(screen.queryByText("Previous AI analysis")).toBeNull();
+    expect(screen.queryByText(/restored from persistent storage/)).toBeNull();
   });
   it("announces loading and prevents repeated submissions while pending", async () => {
     let resolve!: (value: import("../../../src/features/demo/analysis-service").DemoAnalysisResponse) => void;
