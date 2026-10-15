@@ -109,17 +109,22 @@
 
 ### WU-10E — persisted AI state UX clarification
 
-- Planned but not yet implemented.
-- Current persisted AI analysis is intentionally restored from Firestore, but the UI can show an existing recommendation while still labeling the button `Analyze with AI`, which is ambiguous for a reviewer.
-- Planned UX: distinguish first-time analysis from restored prior analysis, use `Analyze Again with AI` when a prior result exists, and explain when a suggested action has already been created.
-- No AI, persistence, deterministic, grounding, Human Gate, IAM, or cloud contract changes are planned for this work unit.
-- The first Codex attempt correctly stopped with `PREREQUISITE_REQUIRED` because its workspace was on branch `work` at a different HEAD rather than the canonical `wu/10-google-cloud-live-deployment` baseline. Repository-context recovery is required before implementation.
+- Implemented and verified locally; live deployment verification remains pending.
+- Intentionally restored durable AI results now show “Previous AI analysis” and explain restoration from persistent storage. Page open does not automatically invoke AI.
+- Successful existing/current-page results use “Analyze Again with AI”; an immediate current-page success does not show restored-analysis wording.
+- Existing recommendation actions display disabled “Suggested action already created”, preserving duplicate prevention and Human Gate controls.
+- Used local component state only; no AI, Firestore schema, persistence, deterministic, grounding, Human Gate, IAM, or cloud contract changes.
+- Recovered the canonical repository baseline without discarding the original work branch; subsequently rebased the implementation unchanged onto remote documentation baseline `2f094e54cd5b510e6cfe5e49236797cf26fe80a9`.
+- Rebased implementation commit: `74c167c83c054790befd7e31c289ecd3f1421fe1` (original local commit `99fbdfa181a7ace9ada570c4e524a42fdf78fb30`).
+- Verification: 434 tests across 48 files, lint/typecheck/build/diff-check PASS. Added four UX regressions and updated existing UI/golden-path assertions.
+- This documentation sync records local completion; it does not claim deployment or final live golden-path success.
 
 ## Current milestone status
 
 - WU-00 through WU-08: PASS.
 - WU-09: deferred to P1.
 - WU-10A through WU-10D: PASS.
+- WU-10E: PASS locally / awaiting live deployment verification.
 - Live AI has successfully produced and persisted a recommendation at least once.
-- WU-10 final closure is still pending WU-10E UX clarification and a clean end-to-end live golden-path verification including Human Gate, Activity, and refresh durability.
+- WU-10 final closure is still pending deployment/live verification of WU-10E and a clean end-to-end live golden-path verification including Human Gate, Activity, and refresh durability.
 - WU-11 final QA / submission readiness has not started.

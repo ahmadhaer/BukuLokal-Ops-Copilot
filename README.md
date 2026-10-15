@@ -14,7 +14,7 @@ The MVP is implemented and deployed to Google Cloud Run. The deterministic opera
 
 The original live Vertex `400 INVALID_ARGUMENT` blocker has been isolated and mitigated. The exact production response schema was accepted only after provider-facing array cardinality constraints (`minItems` / `maxItems`) were omitted; the authoritative Zod constraints remain enforced locally. Provider latency has also shown intermittent `504 DEADLINE_EXCEEDED`, so the current code uses one bounded SDK retry for transient HTTP failures while preserving a 30-second timeout per attempt.
 
-The live application has successfully produced and persisted an AI recommendation. The remaining work before closing WU-10 is now primarily **demo-state / UX clarity and final live golden-path verification**, not basic cloud connectivity.
+The live application has successfully produced and persisted an AI recommendation. WU-10E persisted-AI-state UX clarification has passed local verification. Remaining work before closing WU-10 is **deployment of that UX clarification and final live golden-path verification**.
 
 ### Work-unit status
 
@@ -26,22 +26,22 @@ The live application has successfully produced and persisted an AI recommendatio
 | WU-10B safe AI diagnostics | ✅ PASS |
 | WU-10C array-constraint compatibility fix | ✅ PASS |
 | WU-10D bounded transient retry | ✅ PASS |
-| WU-10E persisted-AI-state UX clarification | 🟡 Planned / not yet implemented |
-| Final live golden-path closure | 🟡 In progress |
+| WU-10E persisted-AI-state UX clarification | ✅ PASS locally / awaiting live deployment verification |
+| Final live golden-path closure | 🟡 Pending live verification |
 | WU-11 final QA / submission readiness | ⏳ Pending |
 
 ### Current verified code baseline
 
-Latest verified code commit before this documentation-only status update:
+Latest locally verified implementation commit, rebased onto remote documentation baseline `2f094e54cd5b510e6cfe5e49236797cf26fe80a9`:
 
 ```text
-b99a29a239622f5caf199d6aa2b82a34cb4f2139
-fix: bound Vertex transient retries to two attempts
+74c167c83c054790befd7e31c289ecd3f1421fe1
+fix: clarify persisted AI analysis state
 ```
 
 Latest local verification reported for that code baseline:
 
-- **430 tests passed across 47 files**
+- **434 tests passed across 48 files**
 - `npm run lint` — PASS
 - `npm run typecheck` — PASS
 - `npm run build` — PASS
@@ -162,18 +162,17 @@ retryable HTTP status:    408, 429, 500, 503, 504
 
 Permanent / non-transient statuses such as 400, 401, 403, and 404 are not retried.
 
-## Current UX issue being addressed (WU-10E)
+## Persisted AI state UX clarification (WU-10E)
 
-A persisted successful AI analysis is intentionally restored from Firestore when the issue page is revisited. Today, the recommendation can therefore appear immediately while the button still says **Analyze with AI**. That behavior is technically correct persistence, but it is ambiguous for a reviewer because it can look as if AI ran automatically or the recommendation was pre-generated.
+**PASS locally / awaiting live deployment verification.** Persisted AI analysis is intentionally restored from durable storage when an issue page is reopened. Opening the page does not automatically invoke AI.
 
-WU-10E is planned to clarify that state without changing Firestore or AI contracts:
+- Never-analyzed issue: **Analyze with AI**, without a restored-analysis notice.
+- Restored successful result: **Previous AI analysis**, with **This analysis was previously generated and restored from persistent storage.**
+- Existing successful analysis: **Analyze Again with AI**.
+- Successful analysis requested in the current page interaction: the normal recommendation and **Analyze Again with AI**, without restored-from-storage wording for that immediate result.
+- Existing recommendation action: disabled **Suggested action already created**; duplicate suggested-action creation remains prevented. Recommendations without an action remain actionable.
 
-- first-time issue: **Analyze with AI**;
-- persisted prior result: show **Previous AI analysis** and explain that it was restored from persistent storage;
-- after a result exists: button becomes **Analyze Again with AI**;
-- existing recommendation action: explain **Suggested action already created** instead of showing only a disabled control.
-
-No automatic reset or deletion of durable AI/action history is planned in this work unit.
+The distinction uses local component state only. No AI, Firestore schema, persistence, deterministic, grounding, or Human Gate contracts changed. Durable AI/action history is retained; no automatic reset or deletion was added.
 
 ## Golden-path demo
 
@@ -195,12 +194,12 @@ The intended demonstration flow is:
    - 2 days remaining
 6. Select **Analyze with AI** (or **Analyze Again with AI** when a prior analysis is restored).
 7. Review the grounded recommendation.
-8. Create a suggested internal action.
+8. Create a suggested internal action if needed; an existing action is identified as **Suggested action already created**.
 9. Approve, edit, or reject it through the Human Gate.
 10. Open **Activity** and verify the audit trail.
 11. Refresh and verify that persisted analysis, action state, and audit history survive reload.
 
-Final WU-10 closure requires this path to be demonstrated cleanly on the live deployment after WU-10E UX clarification.
+Final WU-10 closure requires a clean demonstration of this path on the live deployment with the locally verified WU-10E UX clarification.
 
 ## Architecture
 
@@ -349,16 +348,15 @@ Key documents:
 - [docs/evidence/WU-10A-vertex-schema-compatibility.md](docs/evidence/WU-10A-vertex-schema-compatibility.md) — Vertex schema evidence
 - [docs/evidence/WU-10C-vertex-array-constraint-compatibility.md](docs/evidence/WU-10C-vertex-array-constraint-compatibility.md) — array-constraint compatibility evidence
 - [docs/evidence/WU-10D-bounded-vertex-retry.md](docs/evidence/WU-10D-bounded-vertex-retry.md) — bounded retry evidence
+- [docs/evidence/WU-10E-persisted-ai-state-ux.md](docs/evidence/WU-10E-persisted-ai-state-ux.md) — persisted-analysis UX and local verification evidence
 
 ## Current next step
 
-1. Recover the Codex workspace onto the canonical branch / baseline if necessary.
-2. Implement WU-10E persisted-AI-state UX clarification.
-3. Re-run the full automated verification suite.
-4. Push and deploy the WU-10E revision.
-5. Run the complete live golden path, including Human Gate and refresh durability.
-6. Close WU-10 only after the live evidence passes.
-7. Move to WU-11 final QA, demo readiness, README finalization, and AI Builder Cup submission package.
+1. Publish and deploy the locally verified WU-10E revision through the authorized deployment workflow.
+2. Verify the restored/current-page analysis distinction and duplicate-action explanation live.
+3. Run the complete live golden path, including Human Gate, Activity, and refresh durability.
+4. Close WU-10 only after the live evidence passes.
+5. Proceed to WU-11 final QA, demo readiness, README finalization, and the AI Builder Cup submission package; WU-11 remains pending.
 
 ## License
 
