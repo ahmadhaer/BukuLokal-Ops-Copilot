@@ -69,3 +69,57 @@
 - Added explicit reviewed Save Valid Data with server revalidation and factual counts; no imported issue reconciliation or history deletion was introduced.
 - Added broad UI/application integration, fault/security/replay tests, isolated full-browser test composition, production configuration/import checks, measured demo timing, and demo runbook/evidence.
 - Milestone: HACKATHON_MVP_APPLICATION_INTEGRATED. No live cloud verification, deployment, authentication, Sheets connector, or external execution.
+
+## WU-09 — Google Sheets integration
+
+- Deferred to P1 for the hackathon MVP.
+- No Google Sheets production connector was added to the current submission path.
+
+## WU-10 — Google Cloud live deployment and verification
+
+- Deployed the MVP to Google Cloud Run using a dedicated runtime service account and Application Default Credentials; no service-account JSON key is committed.
+- Provisioned and live-verified Firestore in Native mode and verified create/read/delete behavior with synthetic smoke data.
+- Live-verified direct Vertex Gemini structured-output inference with `gemini-3.5-flash`.
+- Added safe server-side AI diagnostics that classify failures without logging prompts, full evidence payloads, full model output, credentials, or raw sensitive provider messages.
+
+### WU-10A — Vertex schema compatibility
+
+- Removed provider-facing JSON-schema keywords that were incompatible with the active Vertex path while preserving authoritative local Zod validation.
+- Added regression coverage and evidence documentation.
+
+### WU-10B — AI failure diagnostics
+
+- Added structured diagnostic stages for provider, parsing, schema, grounding, action compatibility, record, input, and persistence failures.
+- Confirmed the live remaining failure at that stage was a provider-request HTTP error rather than Firestore, grounding, Zod, Human Gate, or persistence.
+
+### WU-10C — array-constraint compatibility
+
+- Controlled production-schema probes showed the exact schema returned `400 INVALID_ARGUMENT` until `minItems` / `maxItems` were omitted from the provider-facing schema.
+- Kept the authoritative local array limits unchanged in Zod.
+- Added evidence and regression tests for the compatibility sanitizer.
+
+### WU-10D — bounded transient Vertex retry
+
+- Added one bounded SDK retry for transient HTTP statuses `408`, `429`, `500`, `503`, and `504`.
+- Kept a 30-second timeout per HTTP attempt, with two total attempts, 1-second initial delay, 2-second maximum delay, exponential factor 2, and no jitter.
+- Explicitly excluded permanent/non-transient statuses such as 400, 401, 403, and 404 from the retry policy.
+- Added offline installed-SDK retry tests using fake fetch and fake timers.
+- Verification baseline: 430 tests across 47 files, lint/typecheck/build/diff-check PASS.
+- Code baseline commit: `b99a29a239622f5caf199d6aa2b82a34cb4f2139`.
+
+### WU-10E — persisted AI state UX clarification
+
+- Planned but not yet implemented.
+- Current persisted AI analysis is intentionally restored from Firestore, but the UI can show an existing recommendation while still labeling the button `Analyze with AI`, which is ambiguous for a reviewer.
+- Planned UX: distinguish first-time analysis from restored prior analysis, use `Analyze Again with AI` when a prior result exists, and explain when a suggested action has already been created.
+- No AI, persistence, deterministic, grounding, Human Gate, IAM, or cloud contract changes are planned for this work unit.
+- The first Codex attempt correctly stopped with `PREREQUISITE_REQUIRED` because its workspace was on branch `work` at a different HEAD rather than the canonical `wu/10-google-cloud-live-deployment` baseline. Repository-context recovery is required before implementation.
+
+## Current milestone status
+
+- WU-00 through WU-08: PASS.
+- WU-09: deferred to P1.
+- WU-10A through WU-10D: PASS.
+- Live AI has successfully produced and persisted a recommendation at least once.
+- WU-10 final closure is still pending WU-10E UX clarification and a clean end-to-end live golden-path verification including Human Gate, Activity, and refresh durability.
+- WU-11 final QA / submission readiness has not started.

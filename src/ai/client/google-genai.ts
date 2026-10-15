@@ -1,10 +1,15 @@
-import { GoogleGenAI, type GenerateContentParameters, type GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, type GenerateContentParameters, type GenerateContentResponse, type HttpRetryOptions } from "@google/genai";
 import { z } from "zod";
 import type { IssueAnalysisProvider, IssueAnalysisGenerationRequest } from "../analysis/provider";
 import { IssueAnalysisInputSchema, MAX_ANALYSIS_INPUT_BYTES } from "../analysis/input";
 import { AiAnalysisError } from "../analysis/errors";
 
 import { logAiDiagnostic, providerFailureStage, type DiagnosticStage } from "../analysis/diagnostics";
+
+// SDK attempts include the original request; delay units are seconds.
+function vertexRetryOptions(): HttpRetryOptions {
+  return { attempts: 2, initialDelay: 1, maxDelay: 2, expBase: 2, jitter: 0, httpStatusCodes: [408, 429, 500, 503, 504] };
+}
 
 const ConfigSchema = z.strictObject({ project: z.string().trim().min(1), location: z.string().trim().min(1), model: z.string().trim().min(1).regex(/^\S+$/) });
 export type VertexConfig = z.infer<typeof ConfigSchema>;
@@ -26,7 +31,7 @@ export class GeminiIssueAnalysisProvider implements IssueAnalysisProvider {
         contents: [{ role: "user", parts: [{ text: JSON.stringify(input.data) }] }],
         config: { systemInstruction: request.systemInstruction, responseMimeType: "application/json",
           responseJsonSchema: request.responseJsonSchema, temperature: 0, candidateCount: 1,
-          maxOutputTokens: 4_096, httpOptions: { retryOptions: { attempts: 1 }, timeout: 30_000 } },
+          maxOutputTokens: 4_096, httpOptions: { retryOptions: vertexRetryOptions(), timeout: 30_000 } },
       });
       stage = "provider_response";
       if (response.functionCalls?.length) throw new AiAnalysisError("AI_INVALID_RESPONSE", "Tool calls are not permitted in advisory analysis.");
@@ -41,7 +46,7 @@ export class GeminiIssueAnalysisProvider implements IssueAnalysisProvider {
 export function createVertexProvider(env: Record<string, string | undefined> = process.env,
   clientFactory: (config: VertexConfig) => VertexClient = (config) => new GoogleGenAI({
     vertexai: true, project: config.project, location: config.location, apiVersion: "v1",
-    httpOptions: { timeout: 30_000, retryOptions: { attempts: 1 } },
+    httpOptions: { timeout: 30_000, retryOptions: vertexRetryOptions() },
   })): { provider: GeminiIssueAnalysisProvider; config: VertexConfig } {
   if (typeof window !== "undefined") throw new AiAnalysisError("AI_CONFIG_MISSING", "Vertex provider must run on the server using ADC.");
   const config = readVertexConfig(env);

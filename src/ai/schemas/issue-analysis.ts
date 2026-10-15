@@ -15,11 +15,12 @@ export const GeminiIssueAnalysisSchema = z.strictObject({
   cannotDetermine: z.array(text).max(16),
 });
 export type GeminiIssueAnalysis = z.infer<typeof GeminiIssueAnalysisSchema>;
-// Vertex responseJsonSchema excludes string-length and pattern keywords; Zod enforces them locally.
+// Provider-facing compatibility sanitizer for the currently verified Vertex/model path.
+// Authoritative constraints remain enforced locally; array limits are documented SDK keywords.
 function supportedJsonSchema(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(supportedJsonSchema);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value)
-    .filter(([key]) => !["$schema", "minLength", "maxLength", "pattern"].includes(key))
+    .filter(([key]) => !["$schema", "minLength", "maxLength", "pattern", "minItems", "maxItems"].includes(key))
     .map(([key, child]) => [key, supportedJsonSchema(child)]));
   return value;
 }
